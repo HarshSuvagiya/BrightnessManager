@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Brightness Manager</string>
+    <string name="step_desc">Please click on \"GET\" button to maximize your device brightness and then click on save.That\'s it.</string>
+
+    <string name="ad_attribution">Ad</string>
+    <string name="app_id">ca-app-pub-4938515760572795~3289340990</string>
+    <string name="native_ad_unit_id">ca-app-pub-4938515760572795/9471605962</string>
+    <string name="banner_id">ca-app-pub-4938515760572795/3097769304</string>
+    <string name="inter_id">ca-app-pub-4938515760572795/6400427324</string>
+
+    <string name="fb_banner_id">251456445931496_252025195874621</string>
+    <string name="fb_native_id">251456445931496_264741727936301</string>
+    <string name="fb_inter_id">251456445931496_279690049774802</string>
+
+    <!-- TEST ID -->
+<!--        <string name="ad_attribution">Ad</string>-->
+<!--        <string name="app_id">ca-app-pub-3940256099942544~3347511713</string>-->
+<!--        <string name="native_ad_unit_id">ca-app-pub-3940256099942544/2247696110</string>-->
+<!--        <string name="banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+<!--        <string name="inter_id">ca-app-pub-3940256099942544/1033173712</string>-->
+</resources>
+
