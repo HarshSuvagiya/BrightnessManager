@@ -9,7 +9,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
        AudienceNetworkAds.initialize(this);
-        AdSettings.addTestDevice("3b2c3eea-3e39-468d-8623-7f79df47e083");
+        AdSettings.addTestDevice("340e2933-4197-42a7-becd-fe54e5e42200");
         FBInterstitial.getInstance().loadFBInterstitial(this);
 
     }

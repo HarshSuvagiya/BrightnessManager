@@ -1,4 +1,4 @@
-package com.scorpion.brightnessmanager;
+package com.scorpion.brightnessmanager.activity;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
@@ -7,11 +7,9 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -21,31 +19,25 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -59,6 +51,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.scorpion.brightnessmanager.adapter.AppAdapter;
+import com.scorpion.brightnessmanager.model.BrightnessModel;
+import com.scorpion.brightnessmanager.FBInterstitial;
+import com.scorpion.brightnessmanager.service.MyService;
+import com.scorpion.brightnessmanager.PickAppListener;
+import com.scorpion.brightnessmanager.R;
+import com.scorpion.brightnessmanager.SimpleDividerItemDecoration;
+import com.scorpion.brightnessmanager.Utils;
 import com.scorpion.brightnessmanager.adutils.AdHelper;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class BrightnessManagerActivity extends AppCompatActivity {
 
     public AppAdapter appAdapter;
     public ArrayList<BrightnessModel> appList = new ArrayList<>();
@@ -102,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_new);
+        setContentView(R.layout.activity_brightness_manager);
 
-        FirebaseApp.initializeApp(MainActivity.this);
+        FirebaseApp.initializeApp(BrightnessManagerActivity.this);
 
 
         try {
@@ -196,12 +196,12 @@ public class MainActivity extends AppCompatActivity {
                     startService(new Intent(getApplicationContext(), MyService.class));
                     editor.putInt("serviceON", 1);
                     Utils.isServiceOn = 1;
-                    editor.commit();
+                    editor.apply();
                 } else {
                     stopService(new Intent(getApplicationContext(), MyService.class));
                     editor.putInt("serviceON", 0);
                     Utils.isServiceOn = 0;
-                    editor.commit();
+                    editor.apply();
                 }
             }
         });
@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
                 filterList.add(model);
             }
         }
-        appAdapter = new AppAdapter(MainActivity.this, filterList);
+        appAdapter = new AppAdapter(BrightnessManagerActivity.this, filterList);
         recycler.setAdapter(appAdapter);
     }
 
@@ -488,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                    alist.add(appList.get(i));
 //                }
-                AppAdapter appAdapter = new AppAdapter(MainActivity.this, appList);
+                AppAdapter appAdapter = new AppAdapter(BrightnessManagerActivity.this, appList);
                 recycler.setAdapter(appAdapter);
 
             }
@@ -580,9 +580,9 @@ public class MainActivity extends AppCompatActivity {
 
         if(Utils.AdmobFacebook == 2)
         {
-            FBInterstitial.getInstance().displayFBInterstitial(MainActivity.this, new FBInterstitial.FbCallback() {
+            FBInterstitial.getInstance().displayFBInterstitial(BrightnessManagerActivity.this, new FBInterstitial.FbCallback() {
                 public void callbackCall() {
-                    startActivity(new Intent(MainActivity.this, ExitActivity.class));
+                    startActivity(new Intent(BrightnessManagerActivity.this, ExitActivity.class));
                 }
             });
         }
@@ -615,12 +615,12 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onAdClosed() {
-                        startActivity(new Intent(MainActivity.this, ExitActivity.class));
+                        startActivity(new Intent(BrightnessManagerActivity.this, ExitActivity.class));
                     }
                 });
 
             } else {
-                startActivity(new Intent(MainActivity.this, ExitActivity.class));
+                startActivity(new Intent(BrightnessManagerActivity.this, ExitActivity.class));
             }
         }
     }

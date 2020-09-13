@@ -1,4 +1,4 @@
-package com.scorpion.brightnessmanager;
+package com.scorpion.brightnessmanager.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -30,6 +29,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.formats.MediaView;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
+import com.scorpion.brightnessmanager.R;
+import com.scorpion.brightnessmanager.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class ExitActivity extends AppCompatActivity implements Animation.Animati
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(ExitActivity.this, MainActivity.class));
+                startActivity(new Intent(ExitActivity.this, BrightnessManagerActivity.class));
                 finish();
             }
         });
@@ -139,7 +140,7 @@ public class ExitActivity extends AppCompatActivity implements Animation.Animati
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ExitActivity.this, MainActivity.class));
+        startActivity(new Intent(ExitActivity.this, BrightnessManagerActivity.class));
         finish();
     }
 

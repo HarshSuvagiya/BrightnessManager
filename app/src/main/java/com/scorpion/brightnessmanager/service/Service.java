@@ -1,4 +1,4 @@
-package com.scorpion.brightnessmanager;
+package com.scorpion.brightnessmanager.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -7,17 +7,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-import java.util.Map;
+import com.scorpion.brightnessmanager.R;
+import com.scorpion.brightnessmanager.activity.BrightnessManagerActivity;
 
 public class Service extends FirebaseMessagingService {
 
@@ -45,7 +43,7 @@ public class Service extends FirebaseMessagingService {
 
     private void showNotification(Context context) {
         Intent ii;
-        ii = new Intent(context, MainActivity.class);
+        ii = new Intent(context, BrightnessManagerActivity.class);
         ii.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pi = PendingIntent.getActivity(context, 0, ii,PendingIntent.FLAG_UPDATE_CURRENT);

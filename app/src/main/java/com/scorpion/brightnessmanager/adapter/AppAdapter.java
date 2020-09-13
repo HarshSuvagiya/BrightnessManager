@@ -1,9 +1,8 @@
-package com.scorpion.brightnessmanager;
+package com.scorpion.brightnessmanager.adapter;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -30,13 +29,17 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jem.rubberpicker.RubberSeekBar;
+import com.scorpion.brightnessmanager.model.BrightnessModel;
+import com.scorpion.brightnessmanager.FBInterstitial;
+import com.scorpion.brightnessmanager.R;
+import com.scorpion.brightnessmanager.Utils;
 import com.scorpion.brightnessmanager.adutils.AdHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.scorpion.brightnessmanager.MainActivity.brightnessManagerList;
+import static com.scorpion.brightnessmanager.activity.BrightnessManagerActivity.brightnessManagerList;
 
 public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public ArrayList<BrightnessModel> appList;

@@ -1,4 +1,4 @@
-package com.scorpion.brightnessmanager;
+package com.scorpion.brightnessmanager.model;
 
 public class BrightnessModel {
 

@@ -8,7 +8,7 @@ import android.os.Build;
 import android.util.Log;
 
 
-import com.scorpion.brightnessmanager.MyService;
+import com.scorpion.brightnessmanager.service.MyService;
 
 public class CallBroadCastReceiver extends BroadcastReceiver {
 

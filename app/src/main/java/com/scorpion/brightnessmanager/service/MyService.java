@@ -1,4 +1,4 @@
-package com.scorpion.brightnessmanager;
+package com.scorpion.brightnessmanager.service;
 
 import android.app.ActivityManager;
 import android.app.AlarmManager;
@@ -20,13 +20,15 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.scorpion.brightnessmanager.BuildConfig;
+import com.scorpion.brightnessmanager.R;
+import com.scorpion.brightnessmanager.model.BrightnessModel;
 import com.scorpion.brightnessmanager.receivers.CallBroadCastReceiver;
 
 import java.util.ArrayList;
@@ -223,7 +225,7 @@ public class MyService extends Service {
 
     private void setForeground() {
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationManager notificationManager = (NotificationManager) getSystemService("notification");
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             NotificationChannel notificationChannel = new NotificationChannel("noni", "system", 4);
             notificationManager.createNotificationChannel(notificationChannel);
             startForeground(11, new Notification.Builder(this, notificationChannel.getId()).setContentTitle(getResources().getString(R.string.app_name)).setContentText("Long press to hide this notification").setSmallIcon(R.drawable.ic_notifications_black_24dp).build());
