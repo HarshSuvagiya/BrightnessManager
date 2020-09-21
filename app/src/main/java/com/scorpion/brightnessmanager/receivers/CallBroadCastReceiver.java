@@ -20,7 +20,7 @@ public class CallBroadCastReceiver extends BroadcastReceiver {
         shref = context.getSharedPreferences("MyPref", 0);
         editor = shref.edit();
         Log.e("CALL","CALL");
-        if (shref.getInt("serviceON", 0) == 1){
+        if (shref.getInt("serviceONBrightness", 0) == 1 || shref.getInt("serviceONRotation", 0) == 1 || shref.getInt("serviceONVolume", 0) == 1){
             Log.e("CALL","CALL2");
             Intent intent2 = new Intent(context, MyService.class);
             if (Build.VERSION.SDK_INT >= 26) {

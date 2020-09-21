@@ -38,7 +38,7 @@
                 android:dividerPadding="5dp"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="10dp">
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/txtAppName"
@@ -80,15 +80,28 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Require to know currently running app." />
+                            android:text="Require to know currently running app."
+                            android:textColor="#000" />
                     </LinearLayout>
 
                     <com.suke.widget.SwitchButton
                         android:id="@+id/chkUsagePermission"
                         android:layout_width="55dp"
+                        app:sb_checked_color="@color/volume_manager"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_gravity="center"/>
+
+<!--                    <ToggleButton-->
+<!--                        android:id="@+id/chkUsagePermission"-->
+<!--                        android:layout_width="55dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignParentRight="true"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:background="@android:color/transparent"-->
+<!--                        android:button="@drawable/ic_name1_toggle_bg"-->
+<!--                        android:textOff=""-->
+<!--                        android:textOn="" />-->
 
                 </RelativeLayout>
 
@@ -108,22 +121,35 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Modify System Setting"
+                            android:text="Do not disturb permission"
                             android:textColor="#000"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Require to change brightness level \nautomatically" />
+                            android:text="Require to change volume modes"
+                            android:textColor="#000" />
                     </LinearLayout>
 
                     <com.suke.widget.SwitchButton
                         android:id="@+id/chkModifySettingPermission"
                         android:layout_width="55dp"
+                        app:sb_checked_color="@color/volume_manager"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_gravity="center"/>
+
+<!--                    <ToggleButton-->
+<!--                        android:id="@+id/chkModifySettingPermission"-->
+<!--                        android:layout_width="55dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignParentRight="true"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:background="@android:color/transparent"-->
+<!--                        android:button="@drawable/ic_name1_toggle_bg"-->
+<!--                        android:textOff=""-->
+<!--                        android:textOn="" />-->
 
                 </RelativeLayout>
 
@@ -144,24 +170,15 @@
                         android:src="@drawable/btn_save_unpress" />
                 </androidx.cardview.widget.CardView>
 
-                <LinearLayout
-                    android:id="@+id/banner_container1"
+                <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/adView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/adView1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="20dp"
+                    android:layout_centerInParent="true"
                     ads:adSize="BANNER"
                     ads:adUnitId="@string/banner_id"></com.google.android.gms.ads.AdView>
-            </LinearLayout>
 
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 

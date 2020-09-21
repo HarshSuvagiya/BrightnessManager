@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <application
         android:name=".MyApplication"
@@ -19,8 +20,16 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.IntermediateActivity"
-            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.VolumeManagerActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing"></activity>
+        <activity
+            android:name=".activity.RotationManagerActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".activity.IntermediateActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.SplashActivity"
             android:screenOrientation="portrait">
@@ -36,7 +45,7 @@
         <activity
             android:name=".activity.BrightnessManagerActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:windowSoftInputMode="adjustNothing" />
 
         <receiver
             android:name=".receivers.CallBroadCastReceiver"

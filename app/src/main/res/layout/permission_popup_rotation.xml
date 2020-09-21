@@ -86,6 +86,7 @@
                     <com.suke.widget.SwitchButton
                         android:id="@+id/chkUsagePermission"
                         android:layout_width="55dp"
+                        app:sb_checked_color="@color/rotation_manager"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_gravity="center"/>
@@ -122,6 +123,7 @@
                         android:id="@+id/chkModifySettingPermission"
                         android:layout_width="55dp"
                         android:layout_height="wrap_content"
+                        app:sb_checked_color="@color/rotation_manager"
                         android:layout_alignParentRight="true"
                         android:layout_gravity="center"/>
 

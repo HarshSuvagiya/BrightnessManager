@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,19 +30,22 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jem.rubberpicker.RubberSeekBar;
+import com.scorpion.brightnessmanager.activity.BrightnessManagerActivity;
 import com.scorpion.brightnessmanager.model.BrightnessModel;
 import com.scorpion.brightnessmanager.FBInterstitial;
 import com.scorpion.brightnessmanager.R;
 import com.scorpion.brightnessmanager.Utils;
 import com.scorpion.brightnessmanager.adutils.AdHelper;
 import com.squareup.picasso.Picasso;
+import com.suke.widget.SwitchButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 import static com.scorpion.brightnessmanager.activity.BrightnessManagerActivity.brightnessManagerList;
 
-public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BrightnessAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public ArrayList<BrightnessModel> appList;
     private Activity context;
     SharedPreferences shref;
@@ -70,7 +74,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class ViewHolder1 extends RecyclerView.ViewHolder {
         public ImageView im_icon_app;
         public TextView tv_app_name, tv_app_package;
-        ToggleButton toggle;
+        SwitchButton toggle;
 
 
         ViewHolder1(View view) {
@@ -84,7 +88,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public AppAdapter(Activity context2, ArrayList<BrightnessModel> arrayList) {
+    public BrightnessAdapter(Activity context2, ArrayList<BrightnessModel> arrayList) {
         this.context = context2;
         this.appList = arrayList;
 
@@ -139,11 +143,18 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((ViewHolder1) viewHolder).tv_app_name.setText(appList.get(i1).getAppLabel());
             ((ViewHolder1) viewHolder).tv_app_package.setText(appList.get(i1).getPkgName());
 
-            ((ViewHolder1) viewHolder).toggle.setOnClickListener(new View.OnClickListener() {
+//            ((ViewHolder1) viewHolder).toggle.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//
+//                }
+//            });
+
+            ((ViewHolder1) viewHolder).toggle.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View v) {
+                public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                     MaxBrightness = shref.getFloat("MaxBrightness", 200);
-                    if (Utils.isServiceOn == 1) {
+                    if (Utils.isServiceOnBrightness == 1) {
                         if (viewHolderNew.toggle.isChecked()) {
                             viewHolderNew.toggle.setChecked(true);
                             dialog = new Dialog(context);
@@ -162,7 +173,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             final TextView txtBrightnessLevelPreview;
                             ImageView imgAppIcon;
                             CardView viewSave;
-                            ToggleButton chkAutoBrightness;
+                            SwitchButton chkAutoBrightness;
 
                             RubberSeekBar seekbarBrightnessLevel;
 
@@ -197,9 +208,9 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                 }
                             });
 
-                            chkAutoBrightness.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            chkAutoBrightness.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
                                 @Override
-                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                                     if (isChecked) {
                                         isAutoBrightnessChecked = true;
                                         viewSeekbarContainer.setVisibility(View.GONE);
@@ -207,7 +218,6 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                         isAutoBrightnessChecked = false;
                                         viewSeekbarContainer.setVisibility(View.VISIBLE);
                                     }
-
                                 }
                             });
 
@@ -238,22 +248,143 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             addToList();
                         }
                     } else {
-                        Toast.makeText(context, "Please turn on service", Toast.LENGTH_SHORT).show();
-                        viewHolderNew.toggle.setChecked(false);
+
+
+                        switchToggle(viewHolderNew);
+
+//                        if (viewHolderNew.toggle.isChecked())
+//                            viewHolderNew.toggle.setChecked(!viewHolderNew.toggle.isChecked());
                     }
                 }
             });
 
+//            ((ViewHolder1) viewHolder).toggle.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    MaxBrightness = shref.getFloat("MaxBrightness", 200);
+//                    if (Utils.isServiceOn == 1) {
+//                        if (viewHolderNew.toggle.isChecked()) {
+//                            viewHolderNew.toggle.setChecked(true);
+//                            dialog = new Dialog(context);
+//                            dialog.setContentView(R.layout.configure_brightness_popup);
+//                            dialog.setCanceledOnTouchOutside(false);
+//                            dialog.setCancelable(false);
+//                            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+//
+//                            if (Utils.idLoad) {
+//                                adView = dialog.findViewById(R.id.adView);
+//                                layBanner = dialog.findViewById(R.id.banner_container);
+//                                AdHelper.AdLoadHelper(context, adView, layBanner);
+//                            }
+//
+//                            TextView txtAppName;
+//                            final TextView txtBrightnessLevelPreview;
+//                            ImageView imgAppIcon;
+//                            CardView viewSave;
+//                            ToggleButton chkAutoBrightness;
+//
+//                            RubberSeekBar seekbarBrightnessLevel;
+//
+//                            viewSeekbarContainer = dialog.findViewById(R.id.viewSeekbarContainer);
+//
+//                            txtAppName = dialog.findViewById(R.id.txtAppName);
+//                            txtBrightnessLevelPreview = dialog.findViewById(R.id.txtBrightnessLevelPreview);
+//                            imgAppIcon = dialog.findViewById(R.id.imgAppIcon);
+//                            viewSave = dialog.findViewById(R.id.viewSave);
+//                            chkAutoBrightness = dialog.findViewById(R.id.chkAutoBrightness);
+//                            seekbarBrightnessLevel = dialog.findViewById(R.id.seekbarBrightnessLevel);
+//                            seekbarBrightnessLevel.setMax((int) Math.round(MaxBrightness));
+//                            seekbarBrightnessLevel.setCurrentValue((int) (MaxBrightness / 2));
+//                            txtAppName.setText(appList.get(i1).getAppLabel());
+//                            Picasso.get().load(appList.get(i1).getIcon()).placeholder(R.mipmap.ic_launcher).into(imgAppIcon);
+//                            viewSave.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    Utils.totalInterCount++;
+//                                    brightnessManagerList.add(appList.get(i1));
+//                                    addToList();
+//                                    appList.get(i1).setBrightnessValue(getCurrentProgress);
+//                                    appList.get(i1).setAutoBrightness(isAutoBrightnessChecked);
+//                                    dialog.dismiss();
+//                                    addToList();
+//                                    Log.e("TOTAL123", String.valueOf(Utils.totalInterCount));
+//                                    Log.e("TOTAL123456", String.valueOf(Utils.timesInterAd));
+//                                    if (Utils.totalInterCount % Utils.timesInterAd == 0)
+//                                        showAdmobInter();
+//                                    else
+//                                        dialog.dismiss();
+//                                }
+//                            });
+//
+//                            chkAutoBrightness.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                                @Override
+//                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                                    if (isChecked) {
+//                                        isAutoBrightnessChecked = true;
+//                                        viewSeekbarContainer.setVisibility(View.GONE);
+//                                    } else {
+//                                        isAutoBrightnessChecked = false;
+//                                        viewSeekbarContainer.setVisibility(View.VISIBLE);
+//                                    }
+//
+//                                }
+//                            });
+//
+//                            seekbarBrightnessLevel.setOnRubberSeekBarChangeListener(new RubberSeekBar.OnRubberSeekBarChangeListener() {
+//                                @Override
+//                                public void onProgressChanged(RubberSeekBar rubberSeekBar, int i, boolean b) {
+//                                    txtBrightnessLevelPreview.setText(String.valueOf(i));
+//                                    getCurrentProgress = i;
+//                                }
+//
+//                                @Override
+//                                public void onStartTrackingTouch(RubberSeekBar rubberSeekBar) {
+//
+//                                }
+//
+//                                @Override
+//                                public void onStopTrackingTouch(RubberSeekBar rubberSeekBar) {
+//
+//                                }
+//                            });
+//
+//                            dialog.show();
+//                        } else {
+//                            for (int j = 0; j < brightnessManagerList.size(); j++) {
+//                                if (brightnessManagerList.get(j).getPkgName().equals(appList.get(i1).getPkgName()))
+//                                    brightnessManagerList.remove(j);
+//                            }
+//                            addToList();
+//                        }
+//                    } else {
+//                        Toast.makeText(context, "Please turn on service", Toast.LENGTH_SHORT).show();
+//                        viewHolderNew.toggle.setChecked(false);
+//                    }
+//                }
+//            });
+
             for (int j = 0; j < brightnessManagerList.size(); j++) {
-//            Log.e("BRIGHT",brightnessManagerList.get(j).getPkgName() + " "+j);
-//            Log.e("BRIGHT1",appList.get(i).getPkgName() + " " + i);
                 if (appList.get(i1).getPkgName().equals(brightnessManagerList.get(j).getPkgName()))
                     ((ViewHolder1) viewHolder).toggle.setChecked(true);
-//            else
-//                viewHolder.toggle.setChecked(false);
             }
         }
+    }
 
+    public void switchToggle(final ViewHolder1 viewHolderNew){
+        new CountDownTimer(1000,1000){
+
+            @Override
+            public void onTick(long l) {
+                Toast.makeText(context, "Please turn on service", Toast.LENGTH_SHORT).show();
+                viewHolderNew.toggle.setChecked(false);
+
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        }.start();
     }
 
     public void addToList() {

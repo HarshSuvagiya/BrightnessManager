@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_gravity="center"
-            app:sb_checked_color="@color/blue_active"
+            app:sb_checked_color="@color/rotation_manager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

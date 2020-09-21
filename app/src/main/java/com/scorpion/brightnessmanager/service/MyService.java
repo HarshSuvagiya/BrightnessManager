@@ -13,6 +13,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -29,6 +30,8 @@ import com.google.gson.reflect.TypeToken;
 import com.scorpion.brightnessmanager.BuildConfig;
 import com.scorpion.brightnessmanager.R;
 import com.scorpion.brightnessmanager.model.BrightnessModel;
+import com.scorpion.brightnessmanager.model.RotationModel;
+import com.scorpion.brightnessmanager.model.VolumeModel;
 import com.scorpion.brightnessmanager.receivers.CallBroadCastReceiver;
 
 import java.util.ArrayList;
@@ -38,15 +41,33 @@ import java.util.TreeMap;
 
 public class MyService extends Service {
 
-    CountDownTimer countDownTimer;
+    CountDownTimer brightnessCountDownTimer;
+    CountDownTimer rotationCountDownTimer;
+    CountDownTimer volumeCountDownTimer;
     public ArrayList<BrightnessModel> brightnessManagerList = new ArrayList<>();
+    public ArrayList<RotationModel> rotationManagerList = new ArrayList<>();
+    public ArrayList<VolumeModel> volumeManagerList = new ArrayList<>();
     String key = "brightnessManagerList";
+    String key1 = "rotationManagerList";
+    String key2 = "volumeManagerList";
     SharedPreferences shref;
     SharedPreferences.Editor editor;
     Gson gson = new Gson();
     String response;
     float curBrightnessValue = 50;
     boolean flag = true;
+    boolean rotationFlag = true;
+    boolean flag2 = true;
+    boolean flag3 = true;
+    boolean flag4 = true;
+    int defaultMode;
+    int ring;
+    int media;
+    int alarm;
+    int voiceCall;
+    int notification;
+    AudioManager audioManager;
+    boolean tmp = true;
 
     @Override
     public void onCreate() {
@@ -54,44 +75,30 @@ public class MyService extends Service {
         onDestroy();
         setForeground();
 
-//        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);  //this will set the automatic mode on
-//        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-//        Settings.System.putInt(getApplicationContext().getContentResolver(),
-//                Settings.System.SCREEN_BRIGHTNESS, 75);
-
-
         shref = getSharedPreferences("MyPref", Context.MODE_PRIVATE);
 
-
-//        if (gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
-//        }.getType()) != null)
-//            brightnessManagerList = gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
-//            }.getType());
-
-
-        countDownTimer = new CountDownTimer(10000, 2000) {
+//        if (shref.getInt("serviceONBrightness", 0) == 1)
+            brightnessCountDownTimer = new CountDownTimer(10000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                 List<ActivityManager.RunningAppProcessInfo> runningAppProcessInfo = am.getRunningAppProcesses();
 
-
                 response = shref.getString(key, "");
                 if (gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
-                }.getType()) != null)
-                    brightnessManagerList = gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
-                    }.getType());
+                }.getType()) != null) brightnessManagerList = gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
+                }.getType());
 
-
-                if (flag) {
-                    try {
-                        curBrightnessValue = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-                    } catch (Settings.SettingNotFoundException e) {
-                        e.printStackTrace();
+                if (shref.getInt("serviceONBrightness", 0) == 1){
+                    if (flag) {
+                        try {
+                            curBrightnessValue = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                        } catch (Settings.SettingNotFoundException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-                for (int j = 0; j < brightnessManagerList.size(); j++) {
-                    if (brightnessManagerList.get(j).getPkgName().equals(getCurrentAppName())) {
+                    for (int j = 0; j < brightnessManagerList.size(); j++) {
+                        if (brightnessManagerList.get(j).getPkgName().equals(getCurrentAppName())) {
 //                        if(flag){
 //                            try {
 //                                curBrightnessValue = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
@@ -100,30 +107,152 @@ public class MyService extends Service {
 //                            }
 //                            flag = false;
 //                        }
-                        flag = false;
+                            flag = false;
 
-                        if (brightnessManagerList.get(j).isAutoBrightness()) {
-                            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);  //this will set the automatic mode on
-                        } else {
-                            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                            Settings.System.putInt(getApplicationContext().getContentResolver(),
-                                    Settings.System.SCREEN_BRIGHTNESS, brightnessManagerList.get(j).getBrightnessValue());
-                        }
-                        break;
+                            if (brightnessManagerList.get(j).isAutoBrightness()) {
+                                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);  //this will set the automatic mode on
+                            } else {
+                                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                                Settings.System.putInt(getApplicationContext().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessManagerList.get(j).getBrightnessValue());
+                            }
+                            break;
+                        } else flag = true;
                     }
-                    else
+                    if (flag) {
                         flag = true;
-                }
-                if(flag){
-                    flag = true;
-                    Settings.System.putInt(getApplicationContext().getContentResolver(),
-                            Settings.System.SCREEN_BRIGHTNESS, (int) curBrightnessValue);
+                        Settings.System.putInt(getApplicationContext().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, (int) curBrightnessValue);
+                    }
                 }
             }
 
             @Override
             public void onFinish() {
-                countDownTimer.start();
+                brightnessCountDownTimer.start();
+            }
+        }.start();
+
+//        if (shref.getInt("serviceONRotation", 0) == 1)
+            rotationCountDownTimer = new CountDownTimer(10000, 2000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                List<ActivityManager.RunningAppProcessInfo> runningAppProcessInfo = am.getRunningAppProcesses();
+
+                response = shref.getString(key1, "");
+                if (gson.fromJson(response, new TypeToken<List<RotationModel>>() {
+                }.getType()) != null) rotationManagerList = gson.fromJson(response, new TypeToken<List<RotationModel>>() {
+                }.getType());
+
+                if (shref.getInt("serviceONRotation", 0) == 1){
+                    for (int j = 0; j < rotationManagerList.size(); j++) {
+                        if (rotationManagerList.get(j).getPkgName().equals(getCurrentAppName())) {
+                            rotationFlag = false;
+                            flag2 = true;
+
+                            if (rotationManagerList.get(j).isAutoRotation()) {
+                                setAutoOrientationEnabled(getApplicationContext(), true);
+                            } else {
+                                if (rotationManagerList.get(j).getOrientationMode() == 1) {
+                                    Settings.System.putInt(getApplicationContext().getContentResolver(), "accelerometer_rotation", 0);
+                                    Settings.System.putInt(MyService.this.getContentResolver(), "user_rotation", 0);
+                                } else {
+                                    Settings.System.putInt(getApplicationContext().getContentResolver(), "accelerometer_rotation", 0);
+                                    Settings.System.putInt(MyService.this.getContentResolver(), "user_rotation", 1);
+                                }
+                            }
+                            break;
+                        } else rotationFlag = true;
+                    }
+                    if (rotationFlag) {
+//                    rotationFlag = true;
+                        if (flag2) {
+                            Settings.System.putInt(getApplicationContext().getContentResolver(), "accelerometer_rotation", 0);
+                            Settings.System.putInt(MyService.this.getContentResolver(), "user_rotation", 0);
+                            setAutoOrientationEnabled(getApplicationContext(), false);
+                            rotationFlag = false;
+                            flag2 = false;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                rotationCountDownTimer.start();
+            }
+        }.start();
+
+//        if (shref.getInt("serviceONVolume", 0) == 1)
+            volumeCountDownTimer = new CountDownTimer(10000, 2000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                List<ActivityManager.RunningAppProcessInfo> runningAppProcessInfo = am.getRunningAppProcesses();
+                audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+                ring = shref.getInt("ringProgress", audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
+                media = shref.getInt("mediaProgress", audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) - 1);
+                alarm = shref.getInt("alarmProgress", audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM) - 1);
+                voiceCall = shref.getInt("voiceProgress", audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL) - 1);
+                notification = shref.getInt("notificationProgress", audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION));
+                response = shref.getString(key2, "");
+                defaultMode = shref.getInt("defaultMode", 0);
+                if (gson.fromJson(response, new TypeToken<List<VolumeModel>>() {
+                }.getType()) != null) volumeManagerList = gson.fromJson(response, new TypeToken<List<VolumeModel>>() {
+                }.getType());
+
+                Log.e("SIZE", String.valueOf(volumeManagerList.size()));
+
+                if (shref.getInt("serviceONVolume", 0) == 1) {
+                    for (int j = 0; j < volumeManagerList.size(); j++) {
+                        Log.e("APP1", volumeManagerList.get(j).getPkgName());
+                        Log.e("APP1", String.valueOf(volumeManagerList.get(j).getMode()));
+                        Log.e("APP2", getCurrentAppName());
+
+                        if (volumeManagerList.get(j).getPkgName().equals(getCurrentAppName())) {
+                            flag3 = false;
+                            flag4 = true;
+
+                            if (tmp) {
+                                if (volumeManagerList.get(j).getMode() == 0) audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                                else if (volumeManagerList.get(j).getMode() == 1) audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                                else if (volumeManagerList.get(j).getMode() == 2) audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+
+                                audioManager.setStreamVolume(AudioManager.STREAM_RING, volumeManagerList.get(j).getRing(), 0);
+                                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeManagerList.get(j).getMedia(), 0);
+                                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volumeManagerList.get(j).getAlarm(), 0);
+                                audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, volumeManagerList.get(j).getVoiceCall(), 0);
+                                audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, volumeManagerList.get(j).getNotification(), 0);
+                                tmp = false;
+                            }
+                            break;
+                        } else flag3 = true;
+                    }
+                    if (flag3) {
+                        if (flag4) {
+                            tmp = true;
+
+                            if (defaultMode == 0) {
+                                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                                Log.e("MODE", "NORMAL1");
+                            } else if (defaultMode == 1) audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                            else if (defaultMode == 2) audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+
+                            audioManager.setStreamVolume(AudioManager.STREAM_RING, ring, 0);
+                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, media, 0);
+                            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, alarm, 0);
+                            audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, voiceCall, 0);
+                            audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, notification, 0);
+                            Log.e("MODE", "NORMAL2");
+                            flag3 = false;
+                            flag4 = false;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                volumeCountDownTimer.start();
             }
         }.start();
 
@@ -156,8 +285,8 @@ public class MyService extends Service {
     public String getCurrentAppName() {
 
         long currentTimeMillis = System.currentTimeMillis();
-        List<UsageStats> queryUsageStats = ((UsageStatsManager) getApplicationContext().getSystemService("usagestats")).queryUsageStats(0, currentTimeMillis - 3600000, currentTimeMillis);
-        ActivityManager activityManager = (ActivityManager) getSystemService("activity");
+        List<UsageStats> queryUsageStats = ((UsageStatsManager) getApplicationContext().getSystemService(USAGE_STATS_SERVICE)).queryUsageStats(0, currentTimeMillis - 3600000, currentTimeMillis);
+        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         String str = activityManager.getRunningAppProcesses().get(0).processName;
         List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(5);
 
@@ -201,7 +330,7 @@ public class MyService extends Service {
     private static String getLollipopFGAppPackageName(Context ctx) {
 
         try {
-            UsageStatsManager usageStatsManager = (UsageStatsManager) ctx.getSystemService("usagestats");
+            UsageStatsManager usageStatsManager = (UsageStatsManager) ctx.getSystemService(USAGE_STATS_SERVICE);
             long milliSecs = 60 * 1000;
             Date date = new Date();
             List<UsageStats> queryUsageStats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, date.getTime() - milliSecs, date.getTime());
@@ -248,8 +377,25 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (countDownTimer != null)
-            countDownTimer.cancel();
+        if (brightnessCountDownTimer != null) brightnessCountDownTimer.cancel();
+        if (rotationCountDownTimer != null) rotationCountDownTimer.cancel();
+
+        shref = getSharedPreferences("MyPref", Context.MODE_PRIVATE);
+
+//        if (shref.getInt("serviceONBrightness", 0) == 1 || shref.getInt("serviceONRotation", 0) == 1) {
+//            if (shref.getInt("serviceONBrightness", 0) != 1)
+//                if (brightnessCountDownTimer != null)
+//                    brightnessCountDownTimer.cancel();
+//
+//            if (shref.getInt("serviceONRotation", 0) != 1)
+//                if (rotationCountDownTimer != null)
+//                    rotationCountDownTimer.cancel();
+//
+//        } else {
+//            super.onDestroy();
+//            if (brightnessCountDownTimer != null) brightnessCountDownTimer.cancel();
+//            if (rotationCountDownTimer != null) rotationCountDownTimer.cancel();
+//        }
     }
 
     @Nullable
@@ -263,4 +409,9 @@ public class MyService extends Service {
             return MyService.this;
         }
     }
+
+    public static void setAutoOrientationEnabled(Context context, boolean enabled) {
+        Settings.System.putInt(context.getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, enabled ? 1 : 0);
+    }
+
 }

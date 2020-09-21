@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.0"
 
     defaultConfig {
         applicationId "com.scorpion.brightnessmanager"
-        minSdkVersion 16
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 18
         versionName "2.7"
         setProperty("archivesBaseName", "Test_ID_Change_karya")
@@ -62,6 +62,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-ads:19.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.airbnb.android:lottie:3.4.1'
+    implementation 'com.github.zcweng:switch-button:0.0.3@aar'
 
     implementation 'com.facebook.android:audience-network-sdk:5.+'
 

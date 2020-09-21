@@ -25,4 +25,7 @@
     <color name="yellow_inactive">#fff176</color>
     <color name="orange_inactive">#ffb74d</color>
     <color name="gery_inactive">#e0e0e0</color>
+    <color name="your_color">#5c7300</color>
+    <color name="rotation_manager">#5c7300</color>
+    <color name="volume_manager">#180085</color>
 </resources>

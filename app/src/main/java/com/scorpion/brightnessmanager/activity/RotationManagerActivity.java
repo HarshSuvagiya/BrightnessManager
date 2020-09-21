@@ -24,19 +24,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -51,15 +45,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.scorpion.brightnessmanager.adapter.BrightnessAdapter;
-import com.scorpion.brightnessmanager.model.BrightnessModel;
-import com.scorpion.brightnessmanager.FBInterstitial;
-import com.scorpion.brightnessmanager.model.RotationModel;
-import com.scorpion.brightnessmanager.service.MyService;
 import com.scorpion.brightnessmanager.PickAppListener;
 import com.scorpion.brightnessmanager.R;
 import com.scorpion.brightnessmanager.Utils;
+import com.scorpion.brightnessmanager.adapter.RotationAdapter;
 import com.scorpion.brightnessmanager.adutils.AdHelper;
+import com.scorpion.brightnessmanager.model.RotationModel;
+import com.scorpion.brightnessmanager.service.MyService;
 import com.suke.widget.SwitchButton;
 
 import java.util.ArrayList;
@@ -67,20 +59,26 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
-public class BrightnessManagerActivity extends AppCompatActivity {
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.RecyclerView;
 
-    public BrightnessAdapter appAdapter;
-    public ArrayList<BrightnessModel> appList = new ArrayList<>();
+public class RotationManagerActivity extends AppCompatActivity {
+
+    public RotationAdapter appAdapter;
+    public ArrayList<RotationModel> appList = new ArrayList<>();
     public Context context;
     private EditText edtSearch;
     public PickAppListener listener;
-    String key = "brightnessManagerList";
+    String key = "rotationManagerList";
     SharedPreferences shref;
     SharedPreferences.Editor editor;
     private RecyclerView recycler;
-    public static ArrayList<BrightnessModel> brightnessManagerList = new ArrayList<>();
+    public static ArrayList<RotationModel> rotationManagerList = new ArrayList<>();
     SwitchButton usagePermissionToggle, modifyToggle;
     Button closeDialog;
     CardView viewSave;
@@ -89,31 +87,30 @@ public class BrightnessManagerActivity extends AppCompatActivity {
     EditText editSearch;
     SwitchButton service;
     MyService myService;
-    Dialog calibrateDialog;
+    Dialog defaultDialog;
     boolean isCalibrated = false;
     float curBrightnessValue1 = 150;
     ProgressDialog progressDialog;
     RemoteMessage remoteMessage;
-
+    int defaultMode;
     DatabaseReference rootRef;
     private AdView mAdView;
-    LinearLayout premium;
-    ImageView btnPrivacyPolicy;
     private AdView mAdView2, mAdView1;
     LinearLayout layBanner2, layBanner1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_brightness_manager);
+        setContentView(R.layout.activity_rotation_manager);
 
-        FirebaseApp.initializeApp(BrightnessManagerActivity.this);
+        FirebaseApp.initializeApp(RotationManagerActivity.this);
 
+        getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.rotation_manager));
 
         try {
             if (getIntent().getExtras() != null) {
                 Object value = getIntent().getExtras().get("link");
-                Log.e("MainActivity: ", String.valueOf(value));
+//                Log.e("MainActivity: ", String.valueOf(value));
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse((String) value));
                 startActivity(browserIntent);
             }
@@ -121,21 +118,19 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         }
 
         rootRef = FirebaseDatabase.getInstance().getReference();
-        rootRef.child("BrightnessManager").addValueEventListener(new ValueEventListener() {
+        rootRef.child("RotationManager").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 boolean value = Boolean.parseBoolean(dataSnapshot.child("LoadAd").getValue().toString());
+
                 Utils.AdPos = Integer.parseInt(dataSnapshot.child("AdPerItem").getValue().toString());
-                Utils.AdmobFacebook = Integer.parseInt(dataSnapshot.child("AdmobFacebook").getValue().toString());
-//                Utils.AdmobFacebook = 1;
-                Utils.isProLive = Boolean.parseBoolean(dataSnapshot.child("IsProLive").getValue().toString());
                 Utils.timesInterAd = Integer.parseInt(dataSnapshot.child("TimesInterAd").getValue().toString());
-//                Utils.idLoad = false;
                 Utils.idLoad = value;
+//                Utils.idLoad = false;
                 if (Utils.idLoad) {
                     mAdView1 = dialog.findViewById(R.id.adView1);
                     layBanner1 = dialog.findViewById(R.id.banner_container1);
-                    AdHelper.AdLoadHelper(context, mAdView1, layBanner1);
+                    AdHelper.AdLoadHelper(context, mAdView1,layBanner1);
                 }
 
             }
@@ -152,7 +147,7 @@ public class BrightnessManagerActivity extends AppCompatActivity {
 //            }
 //        },2000);
 
-        shref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        shref = getSharedPreferences("MyPref", 0);
         editor = shref.edit();
         context = this;
         progressDialog = new ProgressDialog(context);
@@ -162,72 +157,42 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         progressDialog.show();
         editSearch = findViewById(R.id.editSearch);
         service = findViewById(R.id.serviceToggle);
-        premium = findViewById(R.id.premium);
-        premium.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Utils.isProLive) {
-                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.scorpion.brightnessmanagerpro"); // missing 'http://' will cause crashed
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(context, "Pro version coming soon!!!", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
 
 //        service.setChecked(true);
 //        startService(new Intent(getApplicationContext(), MyService.class));
-//        editor.putInt("serviceONBrightness", 1);
+//        editor.putInt("serviceONRotation", 1);
 //        editor.commit();
 
-        if (shref.getInt("serviceONBrightness", 0) == 1) {
+        if (shref.getInt("serviceONRotation", 0) == 1){
             service.setChecked(true);
-            Utils.isServiceOnBrightness = 1;
-        } else {
+            Utils.isServiceOnRotation = 1;
+        }
+        else{
             service.setChecked(false);
-            Utils.isServiceOnBrightness = 0;
+            Utils.isServiceOnRotation = 0;
         }
 
         service.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+            public void onCheckedChanged(SwitchButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    if (shref.getInt("serviceONVolume", 0) != 1 || shref.getInt("serviceONRotation", 0) != 1) {
+                    if (shref.getInt("serviceONVolume", 0) != 1 || shref.getInt("serviceONBrightness", 0) != 1) {
                         startService(new Intent(getApplicationContext(), MyService.class));
                     }
-                    editor.putInt("serviceONBrightness", 1);
-                    Utils.isServiceOnBrightness = 1;
+                    editor.putInt("serviceONRotation", 1);
+                    Utils.isServiceOnRotation = 1;
                     editor.apply();
                 } else {
-                    if (shref.getInt("serviceONVolume", -1) == 0 && shref.getInt("serviceONRotation", -1) == 0) {
+                    if (shref.getInt("serviceONVolume", -1) == 0 && shref.getInt("serviceONBrightness", -1) == 0) {
                         stopService(new Intent(getApplicationContext(), MyService.class));
                     }
 
-                    editor.putInt("serviceONBrightness", 0);
-                    Utils.isServiceOnBrightness = 0;
+                    editor.putInt("serviceONRotation", 0);
+                    Utils.isServiceOnRotation = 0;
                     editor.apply();
                 }
             }
         });
-
-//        service.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    startService(new Intent(getApplicationContext(), MyService.class));
-//                    editor.putInt("serviceONBrightness", 1);
-//                    Utils.isServiceOnBrightness = 1;
-//                    editor.apply();
-//                } else {
-//                    stopService(new Intent(getApplicationContext(), MyService.class));
-//                    editor.putInt("serviceONBrightness", 0);
-//                    Utils.isServiceOnBrightness = 0;
-//                    editor.apply();
-//                }
-//            }
-//        });
 
         editSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -247,10 +212,10 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         });
 
         dialog = new Dialog(context);
-        dialog.setContentView(R.layout.permission_popup);
+        dialog.setContentView(R.layout.permission_popup_rotation);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
 
         usagePermissionToggle = dialog.findViewById(R.id.chkUsagePermission);
@@ -263,7 +228,6 @@ public class BrightnessManagerActivity extends AppCompatActivity {
                 if (!checkUsageAccess()) {
                     Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                     startActivity(intent);
-//                    usagePermissionToggle.setChecked(true);
                 }
             }
         });
@@ -278,102 +242,52 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         viewSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (usagePermissionToggle.isChecked() && modifyToggle.isChecked()) dialog.dismiss();
-                else Toast.makeText(context, "Please allow all permission!!!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                calibrateDialog = new Dialog(context);
-                calibrateDialog.setContentView(R.layout.find_max_brightness_popup);
-                calibrateDialog.setCanceledOnTouchOutside(false);
-                calibrateDialog.setCancelable(false);
-                Objects.requireNonNull(calibrateDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                calibrateDialog.show();
-                ImageView txtGet;
-                CardView viewSave;
-                txtGet = calibrateDialog.findViewById(R.id.txtGet);
-                viewSave = calibrateDialog.findViewById(R.id.viewSave);
-
-                if (Utils.idLoad) {
-                    mAdView2 = calibrateDialog.findViewById(R.id.adView2);
-                    layBanner2 = calibrateDialog.findViewById(R.id.banner_container2);
-                    AdHelper.AdLoadHelper(context, mAdView2, layBanner2);
+                if (usagePermissionToggle.isChecked() && modifyToggle.isChecked()){
+                    editor.putBoolean("RotationDefaultSet", true);
+                    editor.apply();
+                    dialog.dismiss();
                 }
-
-                txtGet.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        try {
-                            float curBrightnessValue = android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS);
-                            editor.putFloat("MaxBrightness", curBrightnessValue);
-                            editor.commit();
-                        } catch (Settings.SettingNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        Toast.makeText(context, "Make sure your device is on full brightness, if yes hit save.", Toast.LENGTH_SHORT).show();
-                        isCalibrated = true;
-                    }
-                });
-
-                viewSave.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isCalibrated) {
-                            try {
-                                float curBrightnessValue = android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS);
-                                if (curBrightnessValue < 255) curBrightnessValue = 255;
-                                editor.putFloat("MaxBrightness", curBrightnessValue);
-
-                                editor.commit();
-                            } catch (Settings.SettingNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                            Settings.System.putInt(getApplicationContext().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, (int) curBrightnessValue1);
-                            editor.putBoolean("BrightnessDefaultSet", true);
-                            editor.commit();
-                            calibrateDialog.dismiss();
-                        } else Toast.makeText(context, "Please hit GET button in order to calibrate.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                else
+                    Toast.makeText(context, "Please allow all permission!!!", Toast.LENGTH_SHORT).show();
             }
         });
 
 //        if (!isUsageEnabled(getApplicationContext()) || !isModificationEnabled(getApplicationContext())) {
-        if (!shref.getBoolean("BrightnessDefaultSet", false)) dialog.show();
-//        }
+        if(!shref.getBoolean("RotationDefaultSet",false)){
+            dialog.show();
+        }
 
         recycler = findViewById(R.id.recycler);
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
+//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getApplicationContext(),
+//                DividerItemDecoration.VERTICAL);
 //        recycler.addItemDecoration(new SimpleDividerItemDecoration(this));
 //        shref = getSharedPreferences("MyPref", Context.MODE_PRIVATE);
 
         Gson gson = new Gson();
         String response = shref.getString(key, "");
 
-        if (gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
-        }.getType()) != null) brightnessManagerList = gson.fromJson(response, new TypeToken<List<BrightnessModel>>() {
-        }.getType());
+        if (gson.fromJson(response, new TypeToken<List<RotationModel>>() {
+        }.getType()) != null)
+            rotationManagerList = gson.fromJson(response, new TypeToken<List<RotationModel>>() {
+            }.getType());
         context = this;
-        updateRecyclerView("");
 
-
-        btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
-        btnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://sites.google.com/view/brightnessmanager/home"));
-                startActivity(browserIntent);
+            public void onDismiss(DialogInterface dialog) {
+//                showDefaultDialog();
             }
         });
+
+
+//        for(int i = 0 ; i < brightnessManagerList.size() ; i++)
+//            Log.e("PACKAGE000",brightnessManagerList.get(i).getPkgName());
+        updateRecyclerView("");
     }
 
     public void addToList() {
         Gson gson = new Gson();
-        String json = gson.toJson(brightnessManagerList);
+        String json = gson.toJson(rotationManagerList);
         editor = shref.edit();
         editor.putString(key, json);
         editor.commit();
@@ -431,29 +345,30 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         return "";
     }
 
-    public void searchApp(String appName) {
-        ArrayList<BrightnessModel> filterList = new ArrayList<>();
+    public void searchApp(String appName){
+        ArrayList<RotationModel> filterList = new ArrayList<>();
 
-        for (BrightnessModel model : appList) {
-            if (model.getAppLabel().toLowerCase().contains(appName.toLowerCase())) {
+        for (RotationModel model : appList){
+            if (model.getAppLabel().toLowerCase().contains(appName.toLowerCase())){
                 filterList.add(model);
             }
         }
-        appAdapter = new BrightnessAdapter(BrightnessManagerActivity.this, filterList);
+        appAdapter = new RotationAdapter(RotationManagerActivity.this, filterList);
         recycler.setAdapter(appAdapter);
     }
 
     @SuppressLint({"StaticFieldLeak"})
     public void updateRecyclerView(final String str1) {
-        new AsyncTask<Void, Void, ArrayList<BrightnessModel>>() {
+
+        new AsyncTask<Void, Void, ArrayList<RotationModel>>() {
             public void onPreExecute() {
                 super.onPreExecute();
                 appList.clear();
             }
 
-            public ArrayList<BrightnessModel> doInBackground(Void... voidArr) {
+            public ArrayList<RotationModel> doInBackground(Void... voidArr) {
                 PackageManager packageManager = context.getPackageManager();
-                ArrayList<BrightnessModel> arrayList = new ArrayList<>();
+                ArrayList<RotationModel> arrayList = new ArrayList<>();
                 Intent intent = new Intent("android.intent.action.MAIN", null);
                 intent.addCategory("android.intent.category.LAUNCHER");
                 List queryIntentActivities = context.getPackageManager().queryIntentActivities(intent, 0);
@@ -468,52 +383,52 @@ public class BrightnessManagerActivity extends AppCompatActivity {
                     String sb2 = sb.toString();
 
                     if (str1.equals("")) {
-                        BrightnessModel appObject = new BrightnessModel(charSequence, str, sb2, false, 200);
+                        RotationModel appObject = new RotationModel(charSequence, str, sb2, false, 0);
                         if (!checkAppExists(str, arrayList)) {
                             arrayList.add(appObject);
                         }
                     } else if (charSequence.toLowerCase().contains(str1.toLowerCase())) {
-                        BrightnessModel appObject = new BrightnessModel(charSequence, str, sb2, false, 200);
+                        RotationModel appObject = new RotationModel(charSequence, str, sb2, false, 0);
                         if (!checkAppExists(str, arrayList)) {
                             arrayList.add(appObject);
                         }
                     }
                 }
 
-                Collections.sort(arrayList, new Comparator<BrightnessModel>() {
-                    public int compare(BrightnessModel appObject, BrightnessModel appObject2) {
+                Collections.sort(arrayList, new Comparator<RotationModel>() {
+                    public int compare(RotationModel appObject, RotationModel appObject2) {
                         return appObject.getAppLabel().compareTo(appObject2.getAppLabel());
                     }
                 });
                 return arrayList;
             }
 
-            public void onPostExecute(ArrayList<BrightnessModel> arrayList) {
+            public void onPostExecute(ArrayList<RotationModel> arrayList) {
                 super.onPostExecute(arrayList);
                 appList.addAll(arrayList);
 //                appAdapter.notifyDataSetChanged();
 //                pbLoading.setVisibility(8);
                 progressDialog.dismiss();
-//                ArrayList<BrightnessModel> alist = new ArrayList<>();
+//                ArrayList<RotationModel> alist = new ArrayList<>();
 //                for (int i = 0; i < appList.size(); i++) {
 //                    if (i % Utils.AdPos == 0) {
 //                        alist.add(appList.get(i));
 //                    }
 //                    alist.add(appList.get(i));
 //                }
-                BrightnessAdapter appAdapter = new BrightnessAdapter(BrightnessManagerActivity.this, appList);
+                appAdapter = new RotationAdapter(RotationManagerActivity.this, appList);
                 recycler.setAdapter(appAdapter);
 
             }
         }.execute(new Void[0]);
     }
 
-    public boolean checkAppExists(String str, ArrayList<BrightnessModel> arrayList) {
+    public boolean checkAppExists(String str, ArrayList<RotationModel> arrayList) {
         if (arrayList.size() == 0) {
             return false;
         }
         for (int i = 0; i < arrayList.size(); i++) {
-            if (((BrightnessModel) arrayList.get(i)).getPkgName().equals(str)) {
+            if (((RotationModel) arrayList.get(i)).getPkgName().equals(str)) {
                 return true;
             }
         }
@@ -542,12 +457,17 @@ public class BrightnessManagerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Utils.idLoad) initAdmobInter();
-        if (!isUsageEnabled(getApplicationContext())) usagePermissionToggle.setChecked(false);
-        else usagePermissionToggle.setChecked(true);
+        if(Utils.idLoad)
+            initAdmobInter();
+        if (!isUsageEnabled(getApplicationContext()))
+            usagePermissionToggle.setChecked(false);
+        else
+            usagePermissionToggle.setChecked(true);
 
-        if (!isModificationEnabled(getApplicationContext())) modifyToggle.setChecked(false);
-        else modifyToggle.setChecked(true);
+        if (!isModificationEnabled(getApplicationContext()))
+            modifyToggle.setChecked(false);
+        else
+            modifyToggle.setChecked(true);
 
     }
 
@@ -571,7 +491,7 @@ public class BrightnessManagerActivity extends AppCompatActivity {
 
     public static boolean isModificationEnabled(Context context) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return android.provider.Settings.System.canWrite(context);
+            return Settings.System.canWrite(context);
         }
         return true;
     }
@@ -583,51 +503,41 @@ public class BrightnessManagerActivity extends AppCompatActivity {
     }
 
     private InterstitialAd mInterstitialAd;
-
     public void showAdmobInter() {
+        if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
 
-        if (Utils.AdmobFacebook == 2) {
-            FBInterstitial.getInstance().displayFBInterstitial(BrightnessManagerActivity.this, new FBInterstitial.FbCallback() {
-                public void callbackCall() {
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    // Code to be executed when an ad finishes loading.
+                    Log.e("TAG Admob", "The interstitial loaded.");
+                }
+
+                @Override
+                public void onAdFailedToLoad(int errorCode) {
+                    // Code to be executed when an ad request fails.
+                    Log.e("TAG Admob", "The interstitial wasn't loaded yet :" + errorCode);
+                }
+
+                @Override
+                public void onAdOpened() {
+                    // Code to be executed when the ad is displayed.
+                }
+
+                @Override
+                public void onAdLeftApplication() {
+                    // Code to be executed when the user has left the app.
+                }
+
+                @Override
+                public void onAdClosed() {
                     finish();
                 }
             });
+
         } else {
-            if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
-                mInterstitialAd.show();
-
-                mInterstitialAd.setAdListener(new AdListener() {
-                    @Override
-                    public void onAdLoaded() {
-                        // Code to be executed when an ad finishes loading.
-                        Log.e("TAG Admob", "The interstitial loaded.");
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(int errorCode) {
-                        // Code to be executed when an ad request fails.
-                        Log.e("TAG Admob", "The interstitial wasn't loaded yet :" + errorCode);
-                    }
-
-                    @Override
-                    public void onAdOpened() {
-                        // Code to be executed when the ad is displayed.
-                    }
-
-                    @Override
-                    public void onAdLeftApplication() {
-                        // Code to be executed when the user has left the app.
-                    }
-
-                    @Override
-                    public void onAdClosed() {
-                        finish();
-                    }
-                });
-
-            } else {
-                finish();
-            }
+            finish();
         }
     }
 

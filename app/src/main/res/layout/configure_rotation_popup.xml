@@ -69,18 +69,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:layout_marginRight="@dimen/_10sdp"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="@dimen/_10sdp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:text="Auto brightness"
+                    android:text="Auto rotation"
                     android:textColor="#000" />
 
-<!--                <ToggleButton-->
+                <com.suke.widget.SwitchButton
+                    android:id="@+id/chkAutoBrightness"
+                    android:layout_width="55dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="center"/>
+
+                <!--                <ToggleButton-->
 <!--                    android:id="@+id/chkAutoBrightness"-->
 <!--                    android:layout_width="55dp"-->
 <!--                    android:layout_height="wrap_content"-->
@@ -91,28 +98,15 @@
 <!--                    android:textOff=""-->
 <!--                    android:textOn="" />-->
 
-                <com.suke.widget.SwitchButton
-                    android:id="@+id/chkAutoBrightness"
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_gravity="center"/>
-
-<!--                <androidx.appcompat.widget.SwitchCompat-->
-<!--                    android:id="@+id/chkAutoBrightness"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_alignParentRight="true"-->
-<!--                    android:layout_centerVertical="true" />-->
             </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/viewSeekbarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:orientation="vertical"
                 android:paddingTop="10dp">
 
                 <RelativeLayout
@@ -125,7 +119,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:layout_marginTop="5dp"
-                        android:text="Brightness level"
+                        android:text="Orientation mode"
                         android:textColor="#000" />
 
 
@@ -139,24 +133,61 @@
                         android:textStyle="bold" />
                 </RelativeLayout>
 
-                <com.jem.rubberpicker.RubberSeekBar
-                    android:id="@+id/seekbarBrightnessLevel"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:layout_marginBottom="30dp"
-                    app:dampingRatio="0.3"
-                    app:defaultThumbInsideColor="#fff"
-                    app:defaultThumbRadius="15dp"
-                    app:elasticBehavior="linear"
-                    app:highlightDefaultThumbOnTouchColor="#fff"
-                    app:highlightTrackColor="#355fc8"
-                    app:highlightTrackWidth="4dp"
-                    app:minValue="0"
-                    app:normalTrackColor="#aaaaaa"
-                    app:normalTrackWidth="2dp"
-                    app:stiffness="300"
-                    app:stretchRange="24dp" />
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingTop="30dp"
+                    android:weightSum="20">
+
+                    <LinearLayout
+                        android:id="@+id/landscapell"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="10"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+                        <ImageView
+                            android:id="@+id/imgLandscape"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:src="@drawable/icn_phone_landscape" />
+
+                        <RadioButton
+                            android:id="@+id/rdLandscape"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/your_color"
+                            android:layout_gravity="center" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/portraitll"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="10"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+                        <ImageView
+                            android:id="@+id/imgPortrait"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:src="@drawable/icn_phone_portrait" />
+
+                        <RadioButton
+                            android:id="@+id/rdPortrait"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:buttonTint="@color/your_color"
+                            android:checked="true" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
             <androidx.cardview.widget.CardView
@@ -164,6 +195,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="30dp"
                 app:cardBackgroundColor="@color/colorPrimary"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp">
@@ -171,23 +203,15 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/btn_save_unpress" />
+                    android:src="@drawable/close_unpress" />
             </androidx.cardview.widget.CardView>
-
-            <LinearLayout
-                android:id="@+id/banner_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent" />
 
             <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/adView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="30dp"
                 ads:adSize="BANNER"
                 ads:adUnitId="@string/banner_id"></com.google.android.gms.ads.AdView>
 
