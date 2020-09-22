@@ -41,7 +41,7 @@ public class IntermediateActivity extends AppCompatActivity {
                 boolean value = Boolean.parseBoolean(dataSnapshot.child("LoadAd").getValue().toString());
                 Utils.AdPos = Integer.parseInt(dataSnapshot.child("AdPerItem").getValue().toString());
                 Utils.AdmobFacebook = Integer.parseInt(dataSnapshot.child("AdmobFacebook").getValue().toString());
-//                Utils.AdmobFacebook = 2;
+//                Utils.AdmobFacebook = 1;
                 Utils.isProLive = Boolean.parseBoolean(dataSnapshot.child("IsProLive").getValue().toString());
                 Utils.timesInterAd = Integer.parseInt(dataSnapshot.child("TimesInterAd").getValue().toString());
 //                Utils.idLoad = false;
