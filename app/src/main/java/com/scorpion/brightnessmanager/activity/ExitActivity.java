@@ -67,7 +67,7 @@ public class ExitActivity extends AppCompatActivity implements Animation.Animati
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(ExitActivity.this, BrightnessManagerActivity.class));
+                startActivity(new Intent(ExitActivity.this, IntermediateActivity.class));
                 finish();
             }
         });
@@ -140,7 +140,7 @@ public class ExitActivity extends AppCompatActivity implements Animation.Animati
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ExitActivity.this, BrightnessManagerActivity.class));
+        startActivity(new Intent(ExitActivity.this, IntermediateActivity.class));
         finish();
     }
 

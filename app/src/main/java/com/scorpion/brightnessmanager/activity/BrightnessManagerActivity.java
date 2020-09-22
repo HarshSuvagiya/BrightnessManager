@@ -95,7 +95,6 @@ public class BrightnessManagerActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     RemoteMessage remoteMessage;
 
-    DatabaseReference rootRef;
     private AdView mAdView;
     LinearLayout premium;
     ImageView btnPrivacyPolicy;
@@ -107,7 +106,7 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_brightness_manager);
 
-        FirebaseApp.initializeApp(BrightnessManagerActivity.this);
+
 
 
         try {
@@ -120,31 +119,7 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         } catch (Exception e) {
         }
 
-        rootRef = FirebaseDatabase.getInstance().getReference();
-        rootRef.child("BrightnessManager").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                boolean value = Boolean.parseBoolean(dataSnapshot.child("LoadAd").getValue().toString());
-                Utils.AdPos = Integer.parseInt(dataSnapshot.child("AdPerItem").getValue().toString());
-                Utils.AdmobFacebook = Integer.parseInt(dataSnapshot.child("AdmobFacebook").getValue().toString());
-//                Utils.AdmobFacebook = 1;
-                Utils.isProLive = Boolean.parseBoolean(dataSnapshot.child("IsProLive").getValue().toString());
-                Utils.timesInterAd = Integer.parseInt(dataSnapshot.child("TimesInterAd").getValue().toString());
-//                Utils.idLoad = false;
-                Utils.idLoad = value;
-                if (Utils.idLoad) {
-                    mAdView1 = dialog.findViewById(R.id.adView1);
-                    layBanner1 = dialog.findViewById(R.id.banner_container1);
-                    AdHelper.AdLoadHelper(context, mAdView1, layBanner1);
-                }
 
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
 //        new Handler().postDelayed(new Runnable() {
 //            @Override
@@ -343,7 +318,14 @@ public class BrightnessManagerActivity extends AppCompatActivity {
         });
 
 //        if (!isUsageEnabled(getApplicationContext()) || !isModificationEnabled(getApplicationContext())) {
-        if (!shref.getBoolean("BrightnessDefaultSet", false)) dialog.show();
+        if (!shref.getBoolean("BrightnessDefaultSet", false)) {
+            dialog.show();
+            if (Utils.idLoad) {
+                mAdView1 = dialog.findViewById(R.id.adView1);
+                layBanner1 = dialog.findViewById(R.id.banner_container1);
+                AdHelper.AdLoadHelper(context, mAdView1, layBanner1);
+            }
+        }
 //        }
 
         recycler = findViewById(R.id.recycler);
@@ -578,7 +560,7 @@ public class BrightnessManagerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
         showAdmobInter();
     }
 

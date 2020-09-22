@@ -93,7 +93,6 @@ public class RotationManagerActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     RemoteMessage remoteMessage;
     int defaultMode;
-    DatabaseReference rootRef;
     private AdView mAdView;
     private AdView mAdView2, mAdView1;
     LinearLayout layBanner2, layBanner1;
@@ -102,8 +101,6 @@ public class RotationManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rotation_manager);
-
-        FirebaseApp.initializeApp(RotationManagerActivity.this);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.rotation_manager));
 
@@ -117,35 +114,6 @@ public class RotationManagerActivity extends AppCompatActivity {
         } catch (Exception e) {
         }
 
-        rootRef = FirebaseDatabase.getInstance().getReference();
-        rootRef.child("RotationManager").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                boolean value = Boolean.parseBoolean(dataSnapshot.child("LoadAd").getValue().toString());
-
-                Utils.AdPos = Integer.parseInt(dataSnapshot.child("AdPerItem").getValue().toString());
-                Utils.timesInterAd = Integer.parseInt(dataSnapshot.child("TimesInterAd").getValue().toString());
-                Utils.idLoad = value;
-//                Utils.idLoad = false;
-                if (Utils.idLoad) {
-                    mAdView1 = dialog.findViewById(R.id.adView1);
-                    layBanner1 = dialog.findViewById(R.id.banner_container1);
-                    AdHelper.AdLoadHelper(context, mAdView1,layBanner1);
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        },2000);
 
         shref = getSharedPreferences("MyPref", 0);
         editor = shref.edit();
@@ -255,6 +223,12 @@ public class RotationManagerActivity extends AppCompatActivity {
 //        if (!isUsageEnabled(getApplicationContext()) || !isModificationEnabled(getApplicationContext())) {
         if(!shref.getBoolean("RotationDefaultSet",false)){
             dialog.show();
+            if (Utils.idLoad) {
+                mAdView1 = dialog.findViewById(R.id.adView1);
+                layBanner1 = dialog.findViewById(R.id.banner_container1);
+                AdHelper.AdLoadHelper(context, mAdView1,layBanner1);
+            }
+
         }
 
         recycler = findViewById(R.id.recycler);

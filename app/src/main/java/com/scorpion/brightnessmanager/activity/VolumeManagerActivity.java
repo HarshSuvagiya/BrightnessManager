@@ -99,7 +99,6 @@ public class VolumeManagerActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     RemoteMessage remoteMessage;
     int defaultMode;
-    DatabaseReference rootRef;
     private AdView mAdView;
     AudioManager audioManager;
     ImageView settings;
@@ -110,7 +109,6 @@ public class VolumeManagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_volume_manager);
 
-        FirebaseApp.initializeApp(VolumeManagerActivity.this);
         getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.volume_manager));
         try {
             if (getIntent().getExtras() != null) {
@@ -121,29 +119,6 @@ public class VolumeManagerActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
         }
-
-        rootRef = FirebaseDatabase.getInstance().getReference();
-        rootRef.child("VolumeManager").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                boolean value = Boolean.parseBoolean(dataSnapshot.child("LoadAd").getValue().toString());
-
-                Utils.AdPos = Integer.parseInt(dataSnapshot.child("AdPerItem").getValue().toString());
-                Utils.timesInterAd = Integer.parseInt(dataSnapshot.child("TimesInterAd").getValue().toString());
-                Utils.idLoad = value;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        },2000);
 
         shref = getSharedPreferences("MyPref", 0);
         editor = shref.edit();
@@ -157,11 +132,6 @@ public class VolumeManagerActivity extends AppCompatActivity {
         editSearch = findViewById(R.id.editSearch);
         service = findViewById(R.id.serviceToggle);
         settings = findViewById(R.id.settings);
-
-//        service.setChecked(true);
-//        startService(new Intent(getApplicationContext(), MyService.class));
-//        editor.putInt("serviceONVolume", 1);
-//        editor.commit();
 
         if (shref.getInt("serviceONVolume", 0) == 1) {
             service.setChecked(true);
