@@ -8,7 +8,7 @@ android {
         applicationId "com.scorpion.brightnessmanager"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 19
+        versionCode 20
         versionName "2.8"
         setProperty("archivesBaseName", "Test_ID_Change_karya")
         multiDexEnabled true
