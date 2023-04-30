@@ -1,6 +1,6 @@
 # BrightnessManager
 
-An smart manager that helps you to keep your screen brightness according to your preference when ever you open the particular app.
+An smart manager that helps you to keep your screen brightness according to your preference when ever you open any particular app.
 
 ## Social Media
 
