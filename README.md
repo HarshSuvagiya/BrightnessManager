@@ -3,7 +3,7 @@
 An smart manager that helps you to keep your screen brightness according to your preference when ever you open any particular app.
 
 ## Screenshots
-<img src="sc1.png" width="250"><img src="sc2.png" width="250"><img src="sc3.png" width="250">
+<img src="sc1.png" width="250">&nbsp;<img src="sc2.png" width="250">&nbsp;<img src="sc3.png" width="250">
 
 ## Social Media
 
